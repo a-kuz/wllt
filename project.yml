@@ -26,6 +26,10 @@ targets:
       - path: WLLT
         excludes:
           - "**/*.md"
+          - "**/WalletConnectManager.swift"
+          - "**/WalletConnectView.swift"
+          - "**/SessionsView.swift"
+          - "**/RequestView.swift"
     resources:
       - path: WLLT/Resources
         type: folder
@@ -42,6 +46,7 @@ targets:
       - package: KeychainAccess
     frameworks:
       - LocalAuthentication
+      - AVFoundation
     info:
       path: WLLT/Info.plist
       properties:

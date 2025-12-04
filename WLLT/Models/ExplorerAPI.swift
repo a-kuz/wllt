@@ -2,16 +2,16 @@ import Foundation
 
 enum ExplorerAPI {
   static func getBaseURL(for network: SupportedNetwork) -> String {
-    switch network {
-    case .ethereum:
-      "https://api.etherscan.io/api"
-    case .polygon:
-      "https://api.polygonscan.com/api"
-    }
+    network.explorerAPIUrl
   }
 
   static func getAPIKey(for _: SupportedNetwork) -> String? {
     nil
+  }
+  
+  static func getV2URL(for network: SupportedNetwork) -> String {
+    let baseUrl = network.explorerAPIUrl.replacingOccurrences(of: "/api", with: "/v2/api")
+    return baseUrl
   }
 }
 

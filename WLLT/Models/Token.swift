@@ -1,6 +1,6 @@
 import Foundation
 
-struct Token: Identifiable {
+struct Token: Identifiable, Hashable {
   let id = UUID()
   let address: String
   let name: String

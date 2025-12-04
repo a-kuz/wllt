@@ -5,6 +5,7 @@ struct AuthenticationView: View {
   @State private var pin: String = ""
   @State private var showPINEntry = false
   @State private var errorMessage: String?
+  @FocusState private var isPINFocused: Bool
     
   var body: some View {
     VStack(spacing: 32) {
@@ -47,31 +48,41 @@ struct AuthenticationView: View {
         authenticate()
       } else {
         showPINEntry = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          isPINFocused = true
+        }
       }
     }
   }
     
   private var pinEntryView: some View {
-    VStack(spacing: 16) {
+    VStack(spacing: 24) {
       Text("Enter PIN")
         .font(.system(size: 18, weight: .medium))
-            
-      SecureField("PIN", text: $pin)
-        .keyboardType(.numberPad)
-        .textFieldStyle(.roundedBorder)
-        .frame(width: 200)
-            
-      Button(action: {
-        verifyPIN()
-      }) {
-        Text("Unlock")
-          .font(.system(size: 18, weight: .semibold))
-          .foregroundColor(.white)
-          .frame(width: 200)
-          .frame(height: 56)
-          .background(Color.blue)
-          .cornerRadius(12)
+      
+      HStack(spacing: 16) {
+        ForEach(0..<6) { index in
+          Circle()
+            .fill(index < pin.count ? Color.blue : Color.gray.opacity(0.3))
+            .frame(width: 16, height: 16)
+        }
       }
+      .padding(.vertical, 8)
+      
+      TextField("", text: $pin)
+        .keyboardType(.numberPad)
+        .textContentType(.oneTimeCode)
+        .focused($isPINFocused)
+        .opacity(0)
+        .frame(width: 0, height: 0)
+        .onChange(of: pin) { newValue in
+          let filtered = newValue.filter { $0.isNumber }
+          pin = String(filtered.prefix(6))
+          
+          if pin.count == 6 {
+            verifyPIN()
+          }
+        }
     }
   }
     
@@ -80,6 +91,9 @@ struct AuthenticationView: View {
       let success = await authManager.authenticate()
       if !success {
         showPINEntry = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+          isPINFocused = true
+        }
       }
     }
   }
@@ -88,9 +102,11 @@ struct AuthenticationView: View {
     if authManager.verifyPIN(pin) {
       authManager.isAuthenticated = true
       errorMessage = nil
+      pin = ""
     } else {
       errorMessage = "Invalid PIN"
       pin = ""
+      isPINFocused = true
     }
   }
 }

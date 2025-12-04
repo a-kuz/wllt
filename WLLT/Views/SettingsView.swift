@@ -22,6 +22,19 @@ struct SettingsView: View {
                     }
                 }
                 
+                Section("Network") {
+                    Picker("Network Mode", selection: $walletManager.networkMode) {
+                        ForEach(NetworkMode.allCases, id: \.self) { mode in
+                            Text(mode.displayName).tag(mode)
+                        }
+                    }
+                    
+                    if walletManager.networkMode == .testnet {
+                        TestTokensSection()
+                            .environmentObject(walletManager)
+                    }
+                }
+                
                 Section("Security") {
                     Button(action: {
                         requireConfirmation = true
@@ -158,6 +171,51 @@ struct SeedPhraseView: View {
             seedPhrase = try walletManager.getSeedPhrase()
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+}
+
+struct TestTokensSection: View {
+    @EnvironmentObject var walletManager: WalletManager
+    @State private var selectedNetwork: SupportedNetwork = .sepolia
+    
+    var availableNetworks: [SupportedNetwork] {
+        SupportedNetwork.all(for: .testnet)
+    }
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Get Test Tokens")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundColor(.secondary)
+            
+            Picker("Network", selection: $selectedNetwork) {
+                ForEach(availableNetworks, id: \.self) { network in
+                    Text(network.name).tag(network)
+                }
+            }
+            .pickerStyle(.menu)
+            
+            if let faucetURL = walletManager.getFaucetURL(for: selectedNetwork) {
+                Link(destination: faucetURL) {
+                    HStack {
+                        Image(systemName: "drop.fill")
+                        Text("Open Faucet")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(.borderedProminent)
+            }
+            
+            Text("Your address will be pre-filled. Follow the instructions on the faucet page to receive test tokens.")
+                .font(.system(size: 11))
+                .foregroundColor(.secondary)
+        }
+        .onAppear {
+            if let firstNetwork = availableNetworks.first {
+                selectedNetwork = firstNetwork
+            }
         }
     }
 }

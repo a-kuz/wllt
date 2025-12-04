@@ -7,16 +7,16 @@ struct TransactionsView: View {
     NavigationView {
       List {
         if walletManager.transactions.isEmpty {
-          VStack(spacing: 16) {
+          VStack(spacing: 8) {
             Image(systemName: "tray")
-              .font(.system(size: 60))
+              .font(.system(size: 40))
               .foregroundColor(.gray)
             Text("No transactions yet")
-              .font(.system(size: 18))
+              .font(.system(size: 16))
               .foregroundColor(.secondary)
           }
           .frame(maxWidth: .infinity)
-          .padding(.vertical, 48)
+          .padding(.vertical, 24)
           .listRowSeparator(.hidden)
         } else {
           ForEach(walletManager.transactions) { transaction in

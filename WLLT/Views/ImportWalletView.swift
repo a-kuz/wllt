@@ -3,6 +3,7 @@ import SwiftUI
 struct ImportWalletView: View {
   @Environment(\.dismiss) var dismiss
   @EnvironmentObject var walletManager: WalletManager
+  @EnvironmentObject var authManager: AuthenticationManager
   @State private var seedPhrase: String = ""
   @State private var errorMessage: String?
     
@@ -74,8 +75,8 @@ struct ImportWalletView: View {
         
     do {
       try walletManager.importWallet(seedPhrase: trimmedSeed)
-      dismiss()
       errorMessage = nil
+      dismiss()
     } catch {
       errorMessage = error.localizedDescription
     }

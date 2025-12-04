@@ -6,7 +6,9 @@ struct ContentView: View {
 
   var body: some View {
     Group {
-      if walletManager.hasWallet {
+      if !authManager.hasPIN {
+        SetPINView()
+      } else if walletManager.hasWallet {
         if authManager.isAuthenticated {
           MainView()
         } else {

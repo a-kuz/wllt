@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import KeychainAccess
 import LocalAuthentication
 
 class AuthenticationManager: ObservableObject {
@@ -10,6 +11,10 @@ class AuthenticationManager: ObservableObject {
     
   private let keychain = Keychain(service: "com.wllt.auth")
   private let pinKey = "wallet_pin"
+    
+  var hasPIN: Bool {
+    keychain[pinKey] != nil
+  }
     
   private init() {
     checkBiometricType()
@@ -59,7 +64,7 @@ class AuthenticationManager: ObservableObject {
     
   func authenticateWithPIN() async -> Bool {
     guard keychain[pinKey] != nil else {
-      return true
+      return false
     }
         
     return false

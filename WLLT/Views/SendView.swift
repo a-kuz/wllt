@@ -6,6 +6,10 @@ struct SendView: View {
   @State private var recipientAddress: String = ""
   @State private var amount: String = ""
   @State private var selectedNetwork: SupportedNetwork = .ethereum
+  
+  private var availableNetworks: [SupportedNetwork] {
+    SupportedNetwork.all(for: walletManager.networkMode)
+  }
   @State private var selectedToken: Token?
   @State private var isSending = false
   @State private var errorMessage: String?
@@ -16,9 +20,19 @@ struct SendView: View {
       Form {
         Section("Network") {
           Picker("Network", selection: $selectedNetwork) {
-            ForEach(SupportedNetwork.allCases, id: \.self) { network in
+            ForEach(availableNetworks, id: \.self) { network in
               Text(network.name).tag(network)
             }
+          }
+        }
+        .onAppear {
+          if let firstNetwork = availableNetworks.first {
+            selectedNetwork = firstNetwork
+          }
+        }
+        .onChange(of: walletManager.networkMode) { _ in
+          if let firstNetwork = availableNetworks.first {
+            selectedNetwork = firstNetwork
           }
         }
                 

@@ -22,6 +22,12 @@ struct WalletView: View {
         .padding(24)
       }
       .navigationTitle("Wallet")
+      .onAppear {
+        Task {
+          await walletManager.loadBalances()
+          await walletManager.loadTokens()
+        }
+      }
       .refreshable {
         await walletManager.loadBalances()
         await walletManager.loadTokens()
@@ -57,9 +63,37 @@ struct WalletView: View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Balances")
         .font(.system(size: 20, weight: .bold))
+        .frame(maxWidth: .infinity, alignment: .leading)
             
-      ForEach(walletManager.balances) { balance in
-        BalanceRow(balance: balance)
+      if walletManager.balances.isEmpty {
+        VStack(spacing: 8) {
+          ZStack {
+            Circle()
+              .fill(Color.gray.opacity(0.08))
+              .frame(width: 50, height: 50)
+            Image(systemName: "wallet.pass.fill")
+              .font(.system(size: 24))
+              .foregroundColor(.secondary.opacity(0.4))
+          }
+          
+          VStack(spacing: 4) {
+            Text("No balances found")
+              .font(.system(size: 16, weight: .semibold))
+              .foregroundColor(.primary)
+            Text("Your network balances will appear here once they are loaded")
+              .font(.system(size: 13))
+              .foregroundColor(.secondary)
+              .multilineTextAlignment(.center)
+              .lineLimit(2)
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .padding(.horizontal, 16)
+      } else {
+        ForEach(walletManager.balances) { balance in
+          BalanceRow(balance: balance)
+        }
       }
     }
   }
@@ -68,12 +102,33 @@ struct WalletView: View {
     VStack(alignment: .leading, spacing: 16) {
       Text("Tokens")
         .font(.system(size: 20, weight: .bold))
+        .frame(maxWidth: .infinity, alignment: .leading)
             
       if walletManager.tokens.isEmpty {
-        Text("No tokens found")
-          .font(.system(size: 16))
-          .foregroundColor(.secondary)
-          .padding(.vertical, 16)
+        VStack(spacing: 8) {
+          ZStack {
+            Circle()
+              .fill(Color.gray.opacity(0.08))
+              .frame(width: 50, height: 50)
+            Image(systemName: "circle.grid.3x3.fill")
+              .font(.system(size: 24))
+              .foregroundColor(.secondary.opacity(0.4))
+          }
+          
+          VStack(spacing: 4) {
+            Text("No tokens found")
+              .font(.system(size: 16, weight: .semibold))
+              .foregroundColor(.primary)
+            Text("ERC-20 tokens associated with your wallet will be displayed here")
+              .font(.system(size: 13))
+              .foregroundColor(.secondary)
+              .multilineTextAlignment(.center)
+              .lineLimit(2)
+          }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 24)
+        .padding(.horizontal, 16)
       } else {
         ForEach(walletManager.tokens) { token in
           TokenRow(token: token)
