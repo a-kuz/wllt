@@ -1,0 +1,12 @@
+*.xcodeproj
+*.xcworkspace
+.DS_Store
+build/
+DerivedData/
+.swiftpm/
+Pods/
+*.xcuserstate
+*.xcuserdatad
+xcodegen.log
+.swiftlint.yml.bak
+
